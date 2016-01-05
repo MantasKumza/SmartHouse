@@ -4,7 +4,7 @@ var srcCfg = 'https://raw.githubusercontent.com/kum63304/SmartHouse/master/Smart
 var srcMnl = 'https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/mnl.png';
 
 var isStateWaiting = false;
-var zones = ["Terrace", "Summerhouse", "Fireplace", "DriveWay"];
+
 
 jQuery(document).ready(function () {
     for (var i = 0; i < zones.length; i++) {
