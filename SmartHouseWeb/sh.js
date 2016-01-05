@@ -19,9 +19,9 @@ function drawRow(rowData) {
     jQuery("#zones").append(row);
     row.append(jQuery("<td><div class='padding20'>" + rowData + "<div></td>"));
     row.append(jQuery("<td><div id='Light-" + rowData + "' class='noBtn' onclick=\"SwitchLight('" + rowData + "')\">" +
-        "<img async id='imgLight-" + rowData + "'' src='" + srcOn + "'></img><div></td>"));
-    row.append(jQuery("<td><div class='btn' onclick=\"ShowConfigDialog('" + rowData + "')\" ><img async src='\conf.png'/></div></td>"));
-    row.append(jQuery("<td><div class='btn' onclick=\"SwitchManualMode('" + rowData + "')\" ><img async src='\mnl.png'/></div></td>"));
+        "<img  id='imgLight-" + rowData + "'' src='" + srcOff + "'></img><div></td>"));
+    row.append(jQuery("<td><div class='btn' onclick=\"SwitchManualMode('" + rowData + "')\" ><img src='" + srcMnl + "'/></div></td>"));
+    row.append(jQuery("<td><div class='btn' onclick=\"ShowConfigDialog('" + rowData + "')\" ><img  src='" + srcCfg + "'/></div></td>"));
 }
 function GetZonesState() {
     if (!isStateWaiting) {
@@ -44,10 +44,10 @@ function SwitchLight(zoneName) {
 function LightCallBack(data) {
     var lightEl = document.getElementById("imgLight-" + data.ZoneName);
     if (data.IsLightOn) {
-        lightEl.src = '\on.png';
+        lightEl.src = srcOn;
     }
     else {
-        lightEl.src = '\off.png';
+        lightEl.src = srcOff;
     }
 }
 

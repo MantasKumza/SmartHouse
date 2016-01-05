@@ -8,8 +8,7 @@
     <script>
         jQuery(document).ready(function ()
         {
-            var src='https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/sh.js'
-            jQuery.get(src,
+            jQuery.get('https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/sh.js',
                 function (data, status, xhr) {
                     var domscript = document.createElement('script');
                     domscript.text=data;
@@ -17,6 +16,7 @@
                     drawZones();
                 }
                 );
+           
         });
     </script>
 </head>
