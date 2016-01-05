@@ -34,8 +34,6 @@ String Command::get(String key)
 			indexEnd = _params.indexOf(" ", indexStart);
 		if (indexEnd < 0)
 			indexEnd = _params.length();
-
-
 		value = _params.substring(indexStart, indexEnd);
 	}
 

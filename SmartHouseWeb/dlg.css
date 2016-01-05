@@ -1,0 +1,25 @@
+   .noBtn {
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 30px;
+            background: none;
+            text-decoration: none;
+            border: solid;
+            border-width: 2px;
+            border-color: transparent;
+        }
+
+        #configDialog {
+            visibility: hidden;
+            position: absolute;
+            padding: 20px;
+            top: 50px;
+            z-index: 1000;
+            background-color: #4C4C4C;
+            border: solid;
+            border-width: 2px;
+            border-color: white;
+            -webkit-border-radius: 27;
+            -moz-border-radius: 27;
+            border-radius: 20px;
+        }

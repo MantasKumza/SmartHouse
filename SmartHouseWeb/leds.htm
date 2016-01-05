@@ -1,0 +1,63 @@
+<html>
+<head>
+    <title>Arduino</title>
+    <link rel="stylesheet" href="mycss.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>
+        function send(ledNo, value)
+        {
+            jQuery.get('?', { LedNo: ledNo, Value: value });
+        }
+   
+        jQuery.noConflict();
+           
+        jQuery(document).ready(function ()
+        {
+            var leds = [
+                { color: "Blue", pinNo: 22 },
+                { color: "Green", pinNo: 23 },
+                { color: "Yellow", pinNo: 24 },
+                { color: "White", pinNo: 25 },
+                { color: "Red", pinNo: 26 }
+            ];
+            
+            for (var i = 0; i < leds.length; i++)
+            {
+                drawRow(leds[i]);
+            }
+        });  
+  
+        function drawRow(rowData) {
+           
+            var row = jQuery("<tr />");
+            jQuery("#leds").append(row);
+            row.append(jQuery("<td><div class='font' style='color:" + rowData.color + "'>" + rowData.color + "<div></td>"));
+            row.append(jQuery("<td><button onclick=\"send("+rowData.pinNo+",1)\">ON</button></td>"));
+            row.append(jQuery("<td><button onclick=\"send(" + rowData.pinNo + ",0)\">OFF</button></td>"));
+        }
+    </script>
+ </head>
+<body >
+    <center>
+        <table>
+            <tr>
+                <td colspan="2" >
+                    <div class="title" >Test LEDS Control</div>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><table id="leds"></table></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <br>
+                    <br>
+                    <button style="font-size:20px" onclick="window.location = '\index.htm'">&lt;&lt; Back</button>
+                </td>
+            </tr>
+    </center>
+</body>
+</html>
