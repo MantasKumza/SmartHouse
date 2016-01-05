@@ -2,29 +2,8 @@
 <head>
     <title>Arduino</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <link rel="stylesheet" href="mycss.css" />
-    <link async rel="stylesheet" href="dlg.css" />
-    <script async src="dlg.js"></script>
-    <script async src="cmd.js" ></script>
-    <script>
-        var isStateWaiting = false;
-        var zones = ["Terrace", "Summerhouse", "Fireplace", "DriveWay"];
-        jQuery(document).ready(function () {
-            for (var i = 0; i < zones.length; i++) {
-                drawRow(zones[i]);
-            }
-        });
-
-        function drawRow(rowData) {
-            var row = jQuery("<tr />");
-            jQuery("#zones").append(row);
-            row.append(jQuery("<td><div class='padding20'>" + rowData + "<div></td>"));
-            row.append(jQuery("<td><div id='Light-" + rowData + "' class='noBtn' onclick=\"SwitchLight('" + rowData + "')\">" +
-                "<img async id='imgLight-" + rowData + "'' src='\off.png'></img><div></td>"));
-            row.append(jQuery("<td><div class='btn' onclick=\"ShowConfigDialog('" + rowData + "')\" ><img async src='\conf.png'/></div></td>"));
-            row.append(jQuery("<td><div class='btn' onclick=\"SwitchManualMode('" + rowData + "')\" ><img async src='\mnl.png'/></div></td>"));
-        }
-    </script>
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/sh.css" />
+    <script async src="https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/sh.js"></script>
 </head>
 <body>
     <table width="100%">
