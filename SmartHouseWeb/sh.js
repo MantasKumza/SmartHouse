@@ -5,13 +5,14 @@ var srcMnl = 'https://raw.githubusercontent.com/kum63304/SmartHouse/master/Smart
 
 var isStateWaiting = false;
 
+var zones = ["Terrace", "Summerhouse", "Fireplace", "DriveWay"];
 
-jQuery(document).ready(function () {
+function drawZones() {
     for (var i = 0; i < zones.length; i++) {
         drawRow(zones[i]);
     }
     var getZonesStateInterval = setInterval(GetZonesState, 1000);
-});
+}
 
 function drawRow(rowData) {
     var row = jQuery("<tr />");

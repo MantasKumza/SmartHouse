@@ -20,10 +20,10 @@ function SwitchLight(zoneName)
 function LightCallBack(data) {
     var lightEl = document.getElementById("imgLight-" + data.ZoneName);
     if (data.IsLightOn) {
-        lightEl.src = '\on.png';
+        lightEl.src = srcOn;
     }
     else {
-        lightEl.src = '\off.png';
+        lightEl.src = srcOff;
     }
 }
 
