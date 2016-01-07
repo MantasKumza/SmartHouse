@@ -1,38 +1,42 @@
 <html>
 <head>
     <title>Arduino</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, maximum-scale=1, initial-scale=1" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <link rel="stylesheet" href="mycss.css" />
     <link async rel="stylesheet" href="dlg.css" />
-    
+    <script async src="dlg.js"></script>
+    <script async src="cmd.js"></script>
     <script>
-        jQuery(document).ready(function ()
-        {
-            jQuery.get('https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/sh.js',
-                function (data, status, xhr) {
-                    var domscript = document.createElement('script');
-                    domscript.text=data;
-                    document.getElementsByTagName('head')[0].appendChild(domscript);
-                    drawZones();
-                });
+        var srcOff = 'https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/off.png';
+        var srcOn = 'https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/on.png';
+        var srcCfg = 'https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/conf.png';
+        var srcMnl = 'https://raw.githubusercontent.com/kum63304/SmartHouse/master/SmartHouseWeb/mnl.png';
+        var zones = ["Terrace", "Summerhouse", "Fireplace", "DriveWay"];
+        jQuery(document).ready(function () {
+            for (var i = 0; i < zones.length; i++) {
+                drawRow(zones[i]);
+            }
         });
+        function drawRow(rowData) {
+            var row = jQuery("<tr />");
+            jQuery("#zones").append(row);
+            row.append(jQuery("<td><div class='padding20'>" + rowData + "<div></td>"));
+            row.append(jQuery("<td><div id='Light-" + rowData + "' class='noBtn' onclick=\"SwitchLight('" + rowData + "')\">" +
+                "<img  id='imgLight-" + rowData + "'' src='" + srcOff + "'></img><div></td>"));
+            row.append(jQuery("<td><div class='btn' onclick=\"SwitchManualMode('" + rowData + "')\" ><img src='" + srcMnl + "'/></div></td>"));
+            row.append(jQuery("<td><div class='btn' onclick=\"ShowConfigDialog('" + rowData + "')\" ><img  src='" + srcCfg + "'/></div></td>"));
+        }
     </script>
 </head>
 <body>
-    <table width="100%">
-        <tr>
-            <td width="50%">&nbsp;</td>
-            <td>
-                <h2>Outdoor Light Control</h2>
-                <table id="zones" cellspacing="10"></table>
-                <div style="text-align: right; padding-top: 75px">
-                    <button onclick="window.location = '\index.htm'">&lt;&lt; Back</button>
-                </div>
-                <div id="configDialog">
-                </div>
-            </td>
-            <td width="50%">&nbsp;</td>
-        </tr>
-    </table>
+    <h2>Outdoor Light Control</h2>
+    <table id="zones"></table>
+    <div style="text-align: right; padding-top: 75px">
+        <button onclick="window.location = '\index.htm'">&lt;&lt; Back</button>
+    </div>
+    <div id="configDialog">
+    </div>
 </body>
 </html>

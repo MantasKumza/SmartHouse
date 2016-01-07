@@ -1,3 +1,4 @@
+var isStateWaiting = false;
 function GetZonesState() {
     if (!isStateWaiting) {
         isStateWaiting = true;
@@ -26,7 +27,6 @@ function LightCallBack(data) {
         lightEl.src = srcOff;
     }
 }
-
 function SwitchManualMode(zoneName) {
     jQuery.get('/?Command=SwitchManualMode&ZoneName=' + zoneName, ManualModeCallBack);
 }
@@ -39,6 +39,4 @@ function ManualModeCallBack(data) {
         zoneEl.className = 'noBtn';
     }
 }
-
-
 var getZonesStateInterval = setInterval(GetZonesState, 1000);

@@ -4,43 +4,35 @@ button,
 div,
 .title,
 input {
-    font-size: 40px;
     color: white;
     font-weight: bold;
     font-family: Arial;
 }
 
 body {
-    vertical-align: middle;
     background-color: #303030;
 }
 
-h2,h3 {
-    text-align: center;
+.padding20, button, .btn, .btnNofill,.menu,.noBtn {
+    padding: 15px;
 }
 
-.padding20, button, .btn, .btnNofill {
-    padding: 20px;
-}
-
-button, .btn, .btnNofill {
-    -webkit-border-radius: 27;
-    -moz-border-radius: 27;
-    border-radius: 20px;
+button, .btn, .btnNofill,.menu,.noBtn {
+    -webkit-border-radius: 15;
+    -moz-border-radius: 15;
+    border-radius: 15px;
     color: #ffffff;
-    font-size: 30px;
     background: #ff9500;
     text-decoration: none;
     border: solid;
     border-width: 2px;
     border-color: #ff9500;
+    cursor:pointer;
+}
+.menu {
+    margin-top:10px;
 }
 
 .btnNofill {
     background: none;
-}
-
-img {
-    width: 70px;
-    height: 70px;
 }
