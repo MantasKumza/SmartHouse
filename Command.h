@@ -17,7 +17,9 @@ public:
 	String Name;
 	String get(String key);
 	int getInt(String key);
+	bool getBool(String key);
 	bool parse(String line);
+
 	void free();
 };
 

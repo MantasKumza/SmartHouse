@@ -1,8 +1,8 @@
 var cfgDialog = document.getElementById("configDialog");
-var elOffByTime;
-var elTimeOut;
-var elOffHour;
-var eloffMin;
+var elOffByTime = document.getElementById("offByTime");
+var elTimeOut = document.getElementById("timeOut");
+var elOffHour = document.getElementById("offHour");
+var eloffMin = document.getElementById("offMin");
 function ShowConfigDialog(zoneName) {
     document.getElementById("cfgTitle").innerText = zoneName + ' configuration';
     document.getElementById("cofigZoneName").value = zoneName;
@@ -45,15 +45,5 @@ function turnOffByTimeChange() {
     elOffHour.disabled = !turnOffByTime;
     eloffMin.disabled = !turnOffByTime;
 }
-function LoadDialogHtml() {
-    clearInterval(loadDialogHtmlInterval);
-    jQuery.get('/cfgzone.htm', function (data, status, xhr) {
-        cfgDialog.innerHTML = data;
-        elOffByTime = document.getElementById("offByTime");
-        elTimeOut = document.getElementById("timeOut");
-        elOffHour = document.getElementById("offHour");
-        eloffMin = document.getElementById("offMin");
-    });
-}
-var loadDialogHtmlInterval = setInterval(LoadDialogHtml, 1000);
+
 

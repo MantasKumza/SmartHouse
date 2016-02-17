@@ -3,29 +3,40 @@
 #ifndef _OUTDOORLIGHTCONTROL_h
 #define _OUTDOORLIGHTCONTROL_h
 
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
+
 #include "arduino.h"
 #include "string.h"
 #include "Command.h"
 #include "zone.h"
 #include "Ethernet.h"
+#include "CommandProcessor.h"
+#include "Constants.h"
 
-
-class OutdoorLightControl 
+class OutdoorLightControl: public CommandProcessor
 {
 	
 
  private:
 	 
 	 uint8_t _zonesCount = 4;
-	 Zone *_zoneTerrace = new Zone("Terrace");
-	 Zone *_zoneSummerhouse = new Zone("Summerhouse");
-	 Zone *_zoneFireplace = new Zone("Fireplace");
-	 Zone *_zoneDriveWay = new Zone("DriveWay");
+	 Zone *_zoneTerrace = new Zone(Terrace);
+	 Zone *_zoneSummerhouse = new Zone(Summerhouse);
+	 Zone *_zoneFireplace = new Zone(Fireplace);
+	 Zone *_zoneDriveWay = new Zone(DriveIn);
 	 Zone *_zones[4];
 	
 	 String toString(bool value);
 	 Zone* getZoneByName(String zoneName);
 
+	 bool isDark();
+
+	 void loadZoneConfig(ZoneConfig &zoneConfig);
  public:
 
 	 
@@ -33,8 +44,9 @@ class OutdoorLightControl
 	 void setupLightSensor(uint8_t pinNo,int darkFrom);
 	 void begin();
 	 void checkState();
-	 bool isDark();
-	 bool processCommand(const Command &command, String &response);
+	
+	 void printInfo();
+	 virtual bool processCommand(Command &command, String &response);
 	
 	 
 };

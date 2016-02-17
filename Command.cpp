@@ -6,17 +6,17 @@
 
 bool Command::parse(String line)
 {
-  int index= line.indexOf("Command");
-  if (index >= 0)
-  {
-	  _params = line;
-	  Name = get("Command");
-	  return true;
-  }
-  else
-  {
-	  return false;
-  }
+	int index = line.indexOf("Command");
+	if (index >= 0)
+	{
+		_params = line;
+		Name = get("Command");
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 String Command::get(String key)
 {
@@ -30,7 +30,7 @@ String Command::get(String key)
 		int indexStart = index + key.length();
 
 		int indexEnd = _params.indexOf("&", indexStart);
-		if (indexEnd<0)
+		if (indexEnd < 0)
 			indexEnd = _params.indexOf(" ", indexStart);
 		if (indexEnd < 0)
 			indexEnd = _params.length();
@@ -43,6 +43,12 @@ int Command::getInt(String key)
 {
 	return get(key).toInt();
 }
+bool Command::getBool(String key)
+{
+	return get(key) == "true";
+}
+
+
 void Command::free()
 {
 	Name = "";

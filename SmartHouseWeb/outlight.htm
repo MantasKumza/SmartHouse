@@ -37,6 +37,31 @@
         <button onclick="window.location = '\index.htm'">&lt;&lt; Back</button>
     </div>
     <div id="configDialog">
+        <h2 id="cfgTitle"></h2>
+        <input type="hidden" id="cofigZoneName" />
+        <table>
+            <tr>
+                <td>Off Timeout, sec:</td>
+                <td><input id="timeOut" type="number" min="1" /></td>
+            </tr>
+            <tr><td colspan="2">&nbsp;</td></tr>
+            <tr><td colspan="2"><input id="offByTime" type="checkbox" onclick="turnOffByTimeChange()" />Turn Off By Time</td></tr>
+            <tr>
+                <td>Hour:</td>
+                <td><input id="offHour" type="number" min="0" max="23" /></td>
+            </tr>
+            <tr>
+                <td>Minutes:</td>
+                <td><input id="offMin" type="number" min="0" max="59" /></td>
+            </tr>
+            <tr><td colspan="2">&nbsp;</td></tr>
+            <tr>
+                <td colspan="2" style="text-align: right">
+                    <button onclick="SaveConfig()">Save</button>
+                    <button onclick="CloseConfigDialog()">Close</button>
+                <td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>

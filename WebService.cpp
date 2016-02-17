@@ -3,8 +3,7 @@
 #include "IPAddress.h"
 #include "SD.h"
 #include "Command.h"
-#include "OutdoorLightControl.h"
-#include "TimerContoler.h"
+#include "CommandProcessor.h"
 
 void WebService::begin(IPAddress ip, IPAddress dnsAndGateway)
 {
@@ -22,6 +21,8 @@ void WebService::begin(IPAddress ip, IPAddress dnsAndGateway)
 	Serial.println("SD initialization done.");
 
 }
+
+
 void  WebService::listenForClient()
 {
 	EthernetClient client = server.available();  // try to get client
@@ -37,18 +38,17 @@ void  WebService::listenForClient()
 				{
 					if (_readString.length() > 0)
 					{
-						
 						if (command.parse(_readString))
 						{
 							Serial.println(String("Command=") + command.Name);
 							String response;
-							if (outdoorLightControl.processCommand(command, response))
+							for (int i = 0; i < CMD_PROC_COUNT; i++)
 							{
-								sendResponseAsJson(client, response);
-							}
-							else if (timerContoler.processCommand(command, response))
-							{
-								sendResponseAsJson(client, response);
+								if (CommandProcessors[i]->processCommand(command, response))
+								{
+									sendResponseAsJson(client, response,false);
+									break;
+								}
 							}
 							command.free();
 						}
@@ -79,61 +79,7 @@ void  WebService::listenForClient()
 		client.stop(); // close the connection
 	} // end if (client)
 }
-//void  WebService::listenForClient()
-//{
-//	//try this
-//	//http://startingelectronics.org/tutorials/arduino/ethernet-shield-web-server-tutorial/SD-card-web-server-links/
-//	EthernetClient client = server.available();
-//	if (client) {
-//		while (client.connected()) {
-//			if (client.available())
-//			{
-//				Serial.println("Client connected");
-//				char c = client.read();
-//				_readString += c;
-//
-//				if (c == '\n') {
-//					Serial.println(_readString); //print to serial monitor for debugging
-//
-//					if (_readString.length() > 0)
-//					{
-//						if (command.parse(_readString))
-//						{
-//							Serial.println(String("Command=") + command.Name);
-//							String response;
-//							if (outdoorLightControl.processCommand(command, response))
-//							{
-//								sendResponseAsJson(client,response);
-//							}
-//							else if (timerContoler.processCommand(command, response))
-//							{
-//								sendResponseAsJson(client, response);
-//							}
-//							command.free();
-//						}
-//						else
-//						{
-//							String fileName = isRequestedFile(_readString);
-//							Serial.println(String("File=") + fileName);
-//							if (SD.exists(fileName))
-//							{
-//								sendFile(client, fileName);
-//							}
-//						}
-//					}
-//					_readString = "";
-//					//client.stop();
-//				}//if (client.available())
-//			}//while (client.connected())
-//			delay(1);      // give the web browser time to receive the data
-//			client.stop(); // close the connection
-//
-//			//Serial.println("client disconnected");
-//		//	Ethernet.maintain();
-//		}// if (client)
-//
-//	}
-//}
+
 
 
 String WebService::isRequestedFile(String &request)
@@ -185,14 +131,17 @@ void WebService::sendFile(EthernetClient &client, const String &fileName)
 	}
 
 };
-void WebService::sendResponseAsJson(EthernetClient &client, const String &response)
+void WebService::sendResponseAsJson(EthernetClient &client, const String &response, bool isHtml)
 {
 	if (response.length() > 0)
 	{
-		client.println("HTTP/1.1 200 OK");
-		client.println("Content-Type: application/json; charset=utf-8");
-		client.println("Connection: close");  // the connection will be closed after completion of the response
-		client.println();
+		if (isHtml)
+		{
+			client.println("HTTP/1.1 200 OK");
+			client.println("Content-Type: application/json; charset=utf-8");
+			client.println("Connection: close");  // the connection will be closed after completion of the response
+			client.println();
+		}
 		client.println(response);
 	}
 }
