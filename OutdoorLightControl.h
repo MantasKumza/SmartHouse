@@ -18,29 +18,28 @@
 #include "CommandProcessor.h"
 #include "Constants.h"
 
+
+
 class OutdoorLightControl: public CommandProcessor
 {
-	
-
  private:
 	 
-	 uint8_t _zonesCount = 4;
-	 Zone *_zoneTerrace = new Zone(Terrace);
-	 Zone *_zoneSummerhouse = new Zone(Summerhouse);
-	 Zone *_zoneFireplace = new Zone(Fireplace);
-	 Zone *_zoneDriveWay = new Zone(DriveIn);
-	 Zone *_zones[4];
-	
-	 String toString(bool value);
-	 Zone* getZoneByName(String zoneName);
+	 const uint8_t _zonesCount = 7;
+	 Zone *_zones[7];
+	 const uint8_t _motionSensorsCount = 4;
+	 MotionSensor *_motionSensors[4];
 
-	 bool isDark();
+	 Zone* getZone(const char *name);
+	 MotionSensor* getMotionSensor(const char *name);
+	 void relate(const char *zoneName, const char *motionSensorName);
+
 
 	 void loadZoneConfig(ZoneConfig &zoneConfig);
  public:
-
 	 
-	 void setupZone(uint8_t pinMotionSensor, uint8_t pinLight, String zoneName);
+	 void setupZone(const char *name, uint8_t pinNo);
+	 void setupMotionSensor(const char *name, uint8_t pinNo);
+
 	 void setupLightSensor(uint8_t pinNo,int darkFrom);
 	 void begin();
 	 void checkState();

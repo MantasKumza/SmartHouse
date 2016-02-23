@@ -1,7 +1,7 @@
 #include "WebService.h"
 #include "Ethernet.h"
 #include "IPAddress.h"
-#include "SD.h"
+//#include "SD.h"
 #include "Command.h"
 #include "CommandProcessor.h"
 
@@ -11,15 +11,16 @@ void WebService::begin(IPAddress ip, IPAddress dnsAndGateway)
 	byte subnet[] = { 255, 255, 255, 0 };                  //subnet mask
 	Ethernet.begin(mac, ip, dnsAndGateway, dnsAndGateway, subnet);
 	server.begin();
-	Serial.print("WebService started on ");
-	Serial.println(Ethernet.localIP());
 
+
+	/*
+	SD use 50,51,52,53 pins on Sd2PinMap.h file
 	if (!SD.begin(4)) {
-		Serial.println("SD initialization failed!");
-		return;
+	Serial.println("SD initialization failed!");
+	return;
 	}
 	Serial.println("SD initialization done.");
-
+	*/
 }
 
 
@@ -40,13 +41,14 @@ void  WebService::listenForClient()
 					{
 						if (command.parse(_readString))
 						{
-							Serial.println(String("Command=") + command.Name);
+						/*	if (Serial)
+								Serial.println(String("Command=") + command.Name);*/
 							String response;
 							for (int i = 0; i < CMD_PROC_COUNT; i++)
 							{
 								if (CommandProcessors[i]->processCommand(command, response))
 								{
-									sendResponseAsJson(client, response,false);
+									sendResponseAsJson(client, response, false);
 									break;
 								}
 							}
@@ -54,12 +56,13 @@ void  WebService::listenForClient()
 						}
 						else
 						{
-							String fileName = isRequestedFile(_readString);
+							/*String fileName = isRequestedFile(_readString);
+							if (Serial)
 							Serial.println(String("File=") + fileName);
 							if (SD.exists(fileName))
 							{
-								sendFile(client, fileName);
-							}
+							sendFile(client, fileName);
+							}*/
 						}
 					}
 					_readString = "";
@@ -82,55 +85,9 @@ void  WebService::listenForClient()
 
 
 
-String WebService::isRequestedFile(String &request)
-{
-	String file;
-	int indexHTTP = request.indexOf("HTTP");
-	if (indexHTTP > -1 && request.startsWith("GET /"))
-	{
-		request = request.substring(4, indexHTTP);//remove GET
-		request.trim();
-		int indexEnd = request.indexOf("?");
-		if (indexEnd > 0)
-		{
-			file = request.substring(0, indexEnd);
-		}
-		else
-		{
-			file = request.substring(0, indexEnd);
-			if (file == "/") {
-				file = "index.htm";
-			}
-		}
-		return file;
-	}
-	return "";
-};
 
-void WebService::sendFile(EthernetClient &client, const String &fileName)
-{
-	Serial.println(String("sendFile=") + fileName);
-	File myFile = SD.open(fileName);
-	if (myFile) {
 
-		if (!fileName.endsWith(".png"))
-		{
-			client.println("HTTP/1.1 200 OK");
-			client.println("Content-Type: text/html");
-			client.println("Connection: close");  // the connection will be closed after completion of the response
-			client.println();
-		}
-		while (myFile.available()) {
-			client.write(myFile.read());
-		}
-		myFile.close();
-	}
-	else
-	{
-		Serial.println("error opening " + fileName);
-	}
 
-};
 void WebService::sendResponseAsJson(EthernetClient &client, const String &response, bool isHtml)
 {
 	if (response.length() > 0)
@@ -145,7 +102,14 @@ void WebService::sendResponseAsJson(EthernetClient &client, const String &respon
 		client.println(response);
 	}
 }
-
+void printInfo()
+{
+	if (Serial)
+	{
+		Serial.print("WebService started on ");
+		Serial.println(Ethernet.localIP());
+	}
+}
 WebService webService;
 
 

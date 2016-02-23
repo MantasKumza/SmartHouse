@@ -9,40 +9,45 @@
 #else
 #include "WProgram.h"
 #endif
+#include "Config.h"
 
-struct ZoneConfig
+struct ZoneConfig :public Config
 {
-	unsigned long TimeOut = 7;
 	bool OffByTime = false;
 	uint8_t OffHour = 0;
 	uint8_t OffMin = 0;
 };
 
+#include "MotionSensor.h"
+#include <Sodaq_DS3231.h>
+
 class Zone
 {
 private:
-	
-	unsigned long _lastMovementOnMillis = 0;
 	void checkStateByMovement();
-
-
-public:
-	uint8_t _pinMotionSensor = 0;
+	MotionSensor *_motionSensor = nullptr;
 	uint8_t _pinLight = 0;
+public:
+	
+	
 	ZoneConfig Config;
 	
-	String Name;
+	const char *Name;
 	bool IsLightOn = false;
 	bool IsManualMode = false;
-	//Zone();
-	Zone(String name);
-	Zone& operator=(String name);
-	void setup(uint8_t pinMotionSensor, uint8_t pinLight);
+	
+	Zone(const char *name);
+	
+	void setMotionSensor(MotionSensor *motionSensor);
+	void setup(uint8_t pinLight);
+
 	void turnLightON();
 	void turnLightOFF();
-	unsigned long turnOffAfter();
+
 	void printInfo();
-	void checkState(bool isDark, uint8_t hour, uint8_t min);
+	void checkState(bool isDark, DateTime time);
+
+	const char* getMotionSensorName();
 };
 
 

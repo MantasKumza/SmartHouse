@@ -14,11 +14,12 @@ class MotionSensor
 private: 
 	uint8_t _pinMotionSensor;
 	unsigned long _lastMovementOnMillis = 0;
+	bool _wasMove = false;
 
 
 public:
-	String Name;
-	MotionSensor(String name);
+	const char *Name;
+	MotionSensor(const char *name);
 	unsigned long TimeOut = 7;
 	void setup(uint8_t pinIn);
 	bool wasMovement();

@@ -8,105 +8,129 @@
 
 
 
-Zone* OutdoorLightControl::getZoneByName(String zoneName)
-{
-	for (int i = 0; i < _zonesCount; i++)
-	{
-		if (_zones[i]->Name == zoneName)
-		{
-			return _zones[i];
-		}
-	}
-}
+
 void OutdoorLightControl::begin()
 {
 
-	_zones[0] = _zoneTerrace;
-	_zones[1] = _zoneSummerhouse;
-	_zones[2] = _zoneFireplace;
-	_zones[3] = _zoneDriveWay;
+	_zones[0] = new Zone(Zone_TerraceDown);
+	_zones[1] = new Zone(Zone_TerraceGround);
+	_zones[2] = new Zone(Zone_ArborDown);
+	_zones[3] = new Zone(Zone_ArborGround);
+	_zones[4] = new Zone(Zone_ActivePlace);
+	_zones[5] = new Zone(Zone_DriveIn);
+	_zones[6] = new Zone(Zone_Waterfall);
+
+	_motionSensors[0] = new MotionSensor(MotionSensor_Terrace);
+	_motionSensors[1] = new MotionSensor(MotionSensor_Arbor);
+	_motionSensors[2] = new MotionSensor(MotionSensor_DriveIn);
+	_motionSensors[3] = new MotionSensor(MotionSensor_ActivePlace);
+
+	relate(Zone_TerraceDown, MotionSensor_Terrace);
+	relate(Zone_TerraceGround, MotionSensor_Terrace);
+
+	relate(Zone_ArborDown, MotionSensor_Arbor);
+	relate(Zone_ArborGround, MotionSensor_Arbor);
+
+	relate(Zone_ActivePlace, MotionSensor_ActivePlace);
+
+	relate(Zone_DriveIn, MotionSensor_DriveIn);
+	relate(Zone_Waterfall, MotionSensor_DriveIn);
 	//EEPROM.put<ZoneConfig>(0, _zoneTerrace->Config);
 	//EEPROM.put<ZoneConfig>(20, _zoneSummerhouse->Config);
 	//EEPROM.put<ZoneConfig>(40, _zoneFireplace->Config);
 	//EEPROM.put<ZoneConfig>(60, _zoneDriveWay->Config);
 
-	EEPROM.get<ZoneConfig>(0, _zoneTerrace->Config);
+	/*EEPROM.get<ZoneConfig>(0, _zoneTerrace->Config);
 	EEPROM.get<ZoneConfig>(20, _zoneSummerhouse->Config);
 	EEPROM.get<ZoneConfig>(40, _zoneFireplace->Config);
-	EEPROM.get<ZoneConfig>(60, _zoneDriveWay->Config);
+	EEPROM.get<ZoneConfig>(60, _zoneDriveWay->Config);*/
 }
-void OutdoorLightControl::setupZone(uint8_t pinMotionSensor, uint8_t pinLight, String zoneName)
+void OutdoorLightControl::relate(const char *zoneName, const char *motionSensorName)
 {
-	Zone* zone = getZoneByName(zoneName);
-	zone->setup(pinMotionSensor, pinLight);
-	
+	Zone* zone = getZone(zoneName);
+	MotionSensor* motionSensor = getMotionSensor(motionSensorName);
+	zone->setMotionSensor(motionSensor);
+}
+void OutdoorLightControl::setupZone(const char *name, uint8_t pinNo)
+{
+	Zone* zone = getZone(name);
+	zone->setup(pinNo);
+}
+void OutdoorLightControl::setupMotionSensor(const char *name, uint8_t pinNo)
+{
+	MotionSensor* motionSensor = getMotionSensor(name);
+	motionSensor->setup(pinNo);
 }
 
-bool OutdoorLightControl::isDark()
-{
-	return lightSensor.isDark();
-}
+
 void OutdoorLightControl::checkState()
 {
-	DateTime time = rtc.now();
 	bool isDark = lightSensor.isDark();
-
-	_zoneTerrace->checkState(isDark, time.hour(), time.minute());
-	_zoneSummerhouse->checkState(isDark, time.hour(), time.minute());
-	_zoneDriveWay->checkState(isDark, time.hour(), time.minute());
-
-	if (!_zoneFireplace->IsManualMode)
+	for (int i = 0; i < _zonesCount; i++)
 	{
-		if (isDark && (_zoneSummerhouse->IsLightOn || _zoneTerrace->IsLightOn))
+		Zone* zone = _zones[i];
+		if (zone->getMotionSensorName() == Zone_ActivePlace)
 		{
-			_zoneFireplace->turnLightON();
+			if (!zone->IsManualMode)
+			{
+				if (isDark && (getMotionSensor(MotionSensor_Terrace)->wasMovement() || getMotionSensor(MotionSensor_Arbor)->wasMovement()))
+				{
+					zone->turnLightON();
+				}
+				else
+				{
+					zone->checkState(isDark, rtc.now());
+				}
+			}
 		}
 		else
 		{
-
-			_zoneFireplace->checkState(isDark, time.hour(), time.minute());
+			zone->checkState(isDark, rtc.now());
 		}
+
 	}
 }
 
 
-bool OutdoorLightControl::processCommand( Command &command, String &response)
+bool OutdoorLightControl::processCommand(Command &command, String &response)
 {
 
 	JsonResponse json = JsonResponse(response);
-	Serial.println(String("Command=") + command.Name);
-	if (command.Name == "GetZoneConfig")
+	//if (Serial)
+//		Serial.println(String("Command=") + command.Name);
+	if (command.Name == Cmd_GetZoneConfig)
 	{
 
-		Zone* zone = getZoneByName(command.get("ZoneName"));
+		Zone* zone = getZone(command.getChar(Name_ZoneName));
 		json.start();
-		json.append("ZoneName", zone->Name);
-		json.append("TimeOut", zone->Config.TimeOut);
-		json.append("OffHour", zone->Config.OffHour);
-		json.append("OffMin", zone->Config.OffMin);
-		json.append("TurnOffAfter", zone->turnOffAfter());
+		json.append(Name_ZoneName, zone->Name);
+		//json.append(Name_TimeOut, zone->Config.TimeOut);
+		json.append(Name_OffByTime, zone->Config.OffByTime);
+		json.append(Name_OffHour, zone->Config.OffHour);
+		json.append(Name_OffMin, zone->Config.OffMin);
+		//json.append("TurnOffAfter", zone->turnOffAfter());
 		json.end();
 		return true;
 	}
-	else if (command.Name == "SaveZoneConfig")
+	else if (command.Name == Cmd_SaveZoneConfig)
 	{
-		Zone* zone = getZoneByName(command.get("ZoneName"));
-		zone->Config.OffByTime = command.getBool("OffByTime");
-		zone->Config.OffHour = command.getInt("OffHour");
-		zone->Config.OffMin = command.getInt("OffMin");
-		zone->Config.TimeOut = command.getInt("TimeOut");
+		Zone* zone = getZone(command.getChar(Name_ZoneName));
+		zone->Config.OffByTime = command.getBool(Name_OffByTime);
+		zone->Config.OffHour = command.getInt(Name_OffHour);
+		zone->Config.OffMin = command.getInt(Name_OffMin);
+		//zone->Config.TimeOut = command.getInt(Name_TimeOut);
 		return true;
 	}
-	else if (command.Name == "GetZonesState")
+	else if (command.Name == Cmd_GetZonesState)
 	{
 		response = "[";
 		for (int i = 0; i < _zonesCount; i++)
 		{
 			Zone* zone = _zones[i];
 			json.start();
-			json.append("ZoneName", zone->Name);
-			json.append("IsLightOn", zone->IsLightOn);
-			json.append("IsManualMode", zone->IsManualMode);
+			json.append(Name_ZoneName, zone->Name);
+			json.append(Name_IsLightOn, zone->IsLightOn);
+			json.append(Name_IsManualMode, zone->IsManualMode);
 			json.end();
 
 			if (i != _zonesCount - 1)
@@ -115,19 +139,19 @@ bool OutdoorLightControl::processCommand( Command &command, String &response)
 		response += "]";
 		return true;
 	}
-	else if (command.Name == "SwitchManualMode")
+	else if (command.Name == Cmd_SwitchManualMode)
 	{
-		Zone* zone = getZoneByName(command.get("ZoneName"));
+		Zone* zone = getZone(command.getChar(Name_ZoneName));
 		zone->IsManualMode = !zone->IsManualMode;
 		json.start();
-		json.append("ZoneName", zone->Name);
-		json.append("IsManualMode", zone->IsManualMode);
+		json.append(Name_ZoneName, zone->Name);
+		json.append(Name_IsManualMode, zone->IsManualMode);
 		json.end();
 		return true;
 	}
-	else if (command.Name == "SwitchLight")
+	else if (command.Name == Cmd_SwitchLight)
 	{
-		Zone* zone = getZoneByName(command.get("ZoneName"));
+		Zone* zone = getZone(command.get(Name_ZoneName).c_str());
 		if (zone->IsManualMode)
 		{
 			if (zone->IsLightOn)
@@ -136,8 +160,8 @@ bool OutdoorLightControl::processCommand( Command &command, String &response)
 				zone->turnLightON();
 		}
 		json.start();
-		json.append("ZoneName", zone->Name);
-		json.append("IsLightOn", zone->IsLightOn);
+		json.append(Name_ZoneName, zone->Name);
+		json.append(Name_IsLightOn, zone->IsLightOn);
 		json.end();
 		return true;
 	}
@@ -149,6 +173,26 @@ void OutdoorLightControl::printInfo()
 	for (int i = 0; i < _zonesCount; i++)
 	{
 		_zones[i]->printInfo();
+	}
+}
+Zone* OutdoorLightControl::getZone(const char *name)
+{
+	for (int i = 0; i < _zonesCount; i++)
+	{
+		if (_zones[i]->Name == name)
+		{
+			return _zones[i];
+		}
+	}
+}
+MotionSensor* OutdoorLightControl::getMotionSensor(const char *name)
+{
+	for (int i = 0; i < _motionSensorsCount; i++)
+	{
+		if (_motionSensors[i]->Name == name)
+		{
+			return _motionSensors[i];
+		}
 	}
 }
 

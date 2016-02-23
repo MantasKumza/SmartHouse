@@ -90,6 +90,7 @@ extern "C" void __cxa_pure_virtual() {;}
 #include <..\SmartHouse\Command.h>
 #include <..\SmartHouse\CommandProcessor.cpp>
 #include <..\SmartHouse\CommandProcessor.h>
+#include <..\SmartHouse\Config.h>
 #include <..\SmartHouse\Constants.h>
 #include <..\SmartHouse\JsonResponse.cpp>
 #include <..\SmartHouse\JsonResponse.h>

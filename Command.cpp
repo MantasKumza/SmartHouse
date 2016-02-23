@@ -39,6 +39,10 @@ String Command::get(String key)
 
 	return value;
 }
+const char* Command::getChar(String key)
+{
+	return get(key).c_str();
+}
 int Command::getInt(String key)
 {
 	return get(key).toInt();

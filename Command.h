@@ -16,6 +16,7 @@ class Command
 public:
 	String Name;
 	String get(String key);
+	const char* getChar(String key);
 	int getInt(String key);
 	bool getBool(String key);
 	bool parse(String line);

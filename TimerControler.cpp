@@ -27,10 +27,12 @@ bool TimerControler::processCommand(Command &command, String &response)
 }
 void TimerControler::printInfo()
 {
-	String value = "TimerControler now is: ";
-	rtc.now().addToString(value);
-	Serial.println(value);
-
+	if (Serial)
+	{
+		String value = "TimerControler now is: ";
+		rtc.now().addToString(value);
+		Serial.println(value);
+	}
 }
 
 TimerControler timerControler;

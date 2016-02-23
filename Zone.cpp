@@ -1,19 +1,20 @@
 #include "Zone.h"
 
-Zone::Zone(String name)
+Zone::Zone(const char *name)
 {
+	Config.Name = name;
 	Name = name;
 }
-Zone& Zone::operator=(String name)
+
+void Zone::setMotionSensor(MotionSensor *motionSensor)
 {
-	Name = name;
-	return *this;
+	
+	_motionSensor = motionSensor;
 }
-void Zone::setup(uint8_t pinMotionSensor, uint8_t pinLight)
+void Zone::setup(uint8_t pinLight)
 {
-	_pinMotionSensor = pinMotionSensor;
+
 	_pinLight = pinLight;
-	pinMode(_pinMotionSensor, INPUT_PULLUP);
 	pinMode(_pinLight, OUTPUT);
 	turnLightON();
 	delay(200);
@@ -23,21 +24,14 @@ void Zone::setup(uint8_t pinMotionSensor, uint8_t pinLight)
 
 void Zone::checkStateByMovement()
 {
-
-	int isMovement = digitalRead(_pinMotionSensor);
-	if (isMovement == LOW)
+	if (_motionSensor == nullptr) return;
+	if (_motionSensor->wasMovement())
 	{
-		_lastMovementOnMillis = millis();
 		turnLightON();
 	}
 	else
 	{
-		unsigned long timeSpan = millis() - _lastMovementOnMillis;
-		if (timeSpan > Config.TimeOut * 1000)
-		{
-			turnLightOFF();
-		}
-
+		turnLightOFF();
 	}
 }
 void Zone::turnLightOFF()
@@ -51,7 +45,7 @@ void Zone::turnLightON()
 	digitalWrite(_pinLight, HIGH);
 	IsLightOn = true;
 };
-void Zone::checkState(bool isDark, uint8_t hour, uint8_t min)
+void Zone::checkState(bool isDark, DateTime time)
 {
 
 	if (!IsManualMode)
@@ -60,7 +54,7 @@ void Zone::checkState(bool isDark, uint8_t hour, uint8_t min)
 		{
 			if (Config.OffByTime)
 			{
-				if (hour >= Config.OffHour && min >= Config.OffMin)
+				if (time.hour() >= Config.OffHour && time.minute() >= Config.OffMin)
 				{
 					checkStateByMovement();
 				}
@@ -84,17 +78,26 @@ void Zone::checkState(bool isDark, uint8_t hour, uint8_t min)
 
 void Zone::printInfo()
 {
-	Serial.println(String("Zone ") + Name);
-	Serial.println(String("   Motion sensor pin=") + _pinMotionSensor);
-	Serial.println(String("   Light pin=") + _pinLight);
-	Serial.println(String("   TimeOut=") + Config.TimeOut);
-	Serial.println(String("   OffByTime=") + Config.OffByTime);
-	Serial.println(String("   Off Time=") + Config.OffHour+":"+Config.OffMin);
-	
-
+	if (Serial)
+	{
+		Serial.println(String("Zone ") + Name);
+		Serial.println(String("   Light Pin=") + _pinLight);
+		Serial.println(String("   Off By Time=") + Config.OffByTime);
+		Serial.println(String("   Off Time=") + Config.OffHour + ":" + Config.OffMin);
+		if (_motionSensor == nullptr)
+		{
+			Serial.println("   Motion Sensor=None;");
+		}
+		else
+		{
+			Serial.println(String("   MotionSensor=") + _motionSensor->Name + " TimeOut=" + _motionSensor->TimeOut);
+		}
+	}
 };
-unsigned long Zone::turnOffAfter()
+const char* Zone::getMotionSensorName()
 {
-	return millis() - _lastMovementOnMillis;
+	if (_motionSensor == nullptr) return "";
+	return _motionSensor->Name;
 }
+
 

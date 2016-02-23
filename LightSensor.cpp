@@ -28,19 +28,25 @@ bool LightSensor::processCommand(Command &command, String &response)
 {
 	if (command.Name == "SetIsDarkFrom")
 	{
-		_isDarkFrom=command.getInt("DarkFrom");
+		_isDarkFrom = command.getInt("DarkFrom");
 		return true;
 	}
 	else if (command.Name == "SetIsDarkFrom")
 	{
-		
+
 		return true;
 	}
 }
 void LightSensor::printInfo()
 {
-	Serial.println(String("Light sensor: PinIN=") + _pinIn + "; PinOUT" + _pinOut +
-		"; Dark from=" + _isDarkFrom + "; Current value=" + analogRead(_pinIn));
+	if (Serial)
+	{
+		Serial.println("Light sensor:");
+		Serial.println(String("   PinIN = ") + _pinIn);
+		Serial.println(String("   PinOUT = ") + _pinOut);
+		Serial.println(String("   Dark from=") + _isDarkFrom);
+		Serial.println(String("   Current value=") + analogRead(_pinIn));
+	}
 }
 LightSensor lightSensor;
 
